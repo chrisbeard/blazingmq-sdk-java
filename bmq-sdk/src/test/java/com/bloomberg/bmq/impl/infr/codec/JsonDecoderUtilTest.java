@@ -232,6 +232,33 @@ class JsonDecoderUtilTest {
     }
 
     @Test
+    void testGetJsonFromInputStreamEmptyPayload() {
+        ByteBufferInputStream bbis = new ByteBufferInputStream(ByteBuffer.allocate(0));
+
+        try {
+            JsonDecoderUtil.getJsonFromInputStream(bbis);
+            fail();
+        } catch (IOException e) {
+            // OK
+        }
+    }
+
+    @Test
+    void testGetJsonFromInputStreamUndersizedPayload() {
+        // Single byte whose value (as a padding length) exceeds the total
+        // buffer length: 'bytes.length - padding' must not go negative.
+        ByteBuffer buf = ByteBuffer.wrap(new byte[] {4});
+        ByteBufferInputStream bbis = new ByteBufferInputStream(buf);
+
+        try {
+            JsonDecoderUtil.getJsonFromInputStream(bbis);
+            fail();
+        } catch (IOException e) {
+            // OK
+        }
+    }
+
+    @Test
     void testDecodeFromJsonFail() {
         JsonDecoderUtil.decodeFromJson("\"test_string\"", String.class);
         try {
