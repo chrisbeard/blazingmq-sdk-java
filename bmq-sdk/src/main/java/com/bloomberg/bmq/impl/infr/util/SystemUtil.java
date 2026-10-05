@@ -17,7 +17,6 @@ package com.bloomberg.bmq.impl.infr.util;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.lang.management.ManagementFactory;
 import java.net.ServerSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,21 +30,12 @@ public final class SystemUtil {
     }
 
     public static int getProcessId() {
-        int pid = 0;
-        String vmname = null;
         try {
-            vmname = ManagementFactory.getRuntimeMXBean().getName();
-            int pos = vmname.indexOf('@');
-            if (pos != -1) {
-                String processId = vmname.substring(0, pos);
-                pid = Integer.parseInt(processId);
-            }
-        } catch (NumberFormatException e) {
-            logger.info("Cannot get pid from {}: {}", vmname, e);
+            return Math.toIntExact(ProcessHandle.current().pid());
         } catch (Exception e) {
             logger.info("Cannot get pid: ", e);
         }
-        return pid;
+        return 0;
     }
 
     public static String getProcessName() {
